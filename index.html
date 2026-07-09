@@ -4,173 +4,282 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>Video Task Dashboard</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <script src="https://accounts.google.com/gsi/client" async defer></script>
 <style>
   :root {
-    --bg: #0f1115;
-    --panel: #171a21;
-    --panel-2: #1f232c;
-    --border: #2a2f3a;
-    --text: #e8eaed;
-    --text-dim: #9aa0a6;
-    --accent: #4d8dff;
-    --accent-2: #6ee7b7;
-    --danger: #ff6b6b;
-    --warn: #ffb020;
+    --bg: #0b0d12;
+    --bg-grad: radial-gradient(1200px 600px at 80% -10%, rgba(99,102,241,0.15), transparent 60%),
+               radial-gradient(900px 500px at -10% 110%, rgba(139,92,246,0.10), transparent 60%);
+    --panel: rgba(23, 26, 33, 0.85);
+    --panel-2: #1d212b;
+    --border: #2b303c;
+    --text: #eceef2;
+    --text-dim: #98a0ad;
+    --accent: #6366f1;
+    --accent-grad: linear-gradient(135deg, #6366f1, #8b5cf6);
+    --green: #34d399;
+    --red: #f87171;
+    --amber: #fbbf24;
     --gold: #f5c542;
-    --radius: 12px;
+    --radius: 14px;
+    --shadow: 0 8px 30px rgba(0,0,0,0.35);
   }
   * { box-sizing: border-box; }
+  html, body { height: 100%; }
   body {
     margin: 0;
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
     background: var(--bg);
+    background-image: var(--bg-grad);
+    background-attachment: fixed;
     color: var(--text);
     min-height: 100vh;
+    -webkit-font-smoothing: antialiased;
   }
-  .container { max-width: 960px; margin: 0 auto; padding: 20px 16px 80px; }
+  .container { max-width: 980px; margin: 0 auto; padding: 20px 16px 90px; }
 
+  /* ---------- Login ---------- */
   #loginScreen {
     display: flex; flex-direction: column; align-items: center; justify-content: center;
     min-height: 100vh; text-align: center; padding: 24px;
   }
-  #loginScreen h1 { font-size: 28px; margin-bottom: 6px; }
-  #loginScreen p { color: var(--text-dim); margin-bottom: 28px; }
-  .google-btn {
-    background: #fff; color: #1f1f1f; border: none; padding: 12px 24px; border-radius: 8px;
-    font-size: 15px; font-weight: 600; cursor: pointer; display: flex; align-items: center; gap: 10px;
+  .login-card {
+    background: var(--panel); border: 1px solid var(--border); border-radius: 20px;
+    padding: 44px 36px; max-width: 400px; width: 100%; box-shadow: var(--shadow);
+    backdrop-filter: blur(8px);
   }
-  .google-btn:hover { background: #f0f0f0; }
-  #loginLoading { display:none; color: var(--text-dim); margin-top: 14px; font-size: 13px; }
+  .logo-mark {
+    width: 56px; height: 56px; border-radius: 16px; background: var(--accent-grad);
+    display: flex; align-items: center; justify-content: center; font-size: 28px;
+    margin: 0 auto 18px; box-shadow: 0 6px 20px rgba(99,102,241,0.4);
+  }
+  .login-card h1 { font-size: 22px; margin: 0 0 6px; font-weight: 700; letter-spacing: -0.02em; }
+  .login-card p { color: var(--text-dim); margin: 0 0 26px; font-size: 14px; }
+  .google-btn {
+    background: #fff; color: #1f1f1f; border: none; padding: 12px 22px; border-radius: 10px;
+    font-size: 15px; font-weight: 600; cursor: pointer; display: inline-flex; align-items: center; gap: 10px;
+    font-family: inherit; transition: transform .12s ease, box-shadow .12s ease;
+  }
+  .google-btn:hover { transform: translateY(-1px); box-shadow: 0 6px 18px rgba(255,255,255,0.12); }
+  #loginLoading { display: none; color: var(--text-dim); margin-top: 16px; font-size: 13px; }
+  #loginError { color: var(--red); margin-top: 16px; font-size: 13px; min-height: 18px; }
 
+  /* ---------- Header ---------- */
   header {
     display: flex; justify-content: space-between; align-items: center;
-    padding: 14px 0; border-bottom: 1px solid var(--border); margin-bottom: 20px; flex-wrap: wrap; gap: 10px;
+    padding: 16px 0; border-bottom: 1px solid var(--border); margin-bottom: 18px; flex-wrap: wrap; gap: 12px;
   }
-  header .title { font-size: 20px; font-weight: 600; }
-  header .badge {
-    font-size: 12px; padding: 3px 10px; border-radius: 20px; background: var(--panel-2);
-    color: var(--accent-2); border: 1px solid var(--border);
+  .brand { display: flex; align-items: center; gap: 12px; }
+  .brand .mini-mark {
+    width: 36px; height: 36px; border-radius: 10px; background: var(--accent-grad);
+    display: flex; align-items: center; justify-content: center; font-size: 18px;
   }
-  header .userinfo { display: flex; align-items: center; gap: 10px; font-size: 14px; color: var(--text-dim); }
-  header img.avatar { width: 30px; height: 30px; border-radius: 50%; }
+  .brand .title { font-size: 18px; font-weight: 700; letter-spacing: -0.02em; }
+  .badge {
+    font-size: 11px; padding: 3px 10px; border-radius: 20px; background: rgba(99,102,241,0.15);
+    color: #a5b4fc; border: 1px solid rgba(99,102,241,0.35); font-weight: 600; letter-spacing: 0.03em;
+  }
+  .userinfo { display: flex; align-items: center; gap: 10px; font-size: 14px; color: var(--text-dim); }
+  img.avatar { width: 32px; height: 32px; border-radius: 50%; border: 1px solid var(--border); }
   button.logout {
     background: transparent; border: 1px solid var(--border); color: var(--text-dim);
-    padding: 6px 12px; border-radius: 8px; cursor: pointer; font-size: 13px;
+    padding: 7px 14px; border-radius: 9px; cursor: pointer; font-size: 13px; font-family: inherit;
+    transition: all .12s ease;
   }
-  button.logout:hover { border-color: var(--danger); color: var(--danger); }
+  button.logout:hover { border-color: var(--red); color: var(--red); }
 
-  #syncStatus { font-size: 12px; color: var(--text-dim); margin-bottom: 16px; display: flex; align-items: center; gap: 6px; }
-  #syncStatus .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--accent-2); }
-  #syncStatus.saving .dot { background: var(--warn); }
-  #syncStatus.error .dot { background: var(--danger); }
+  /* ---------- Sync ---------- */
+  .sync-row { display: flex; align-items: center; justify-content: space-between; margin-bottom: 18px; flex-wrap: wrap; gap: 8px; }
+  #syncStatus { font-size: 12px; color: var(--text-dim); display: flex; align-items: center; gap: 7px; }
+  #syncStatus .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--green); box-shadow: 0 0 8px rgba(52,211,153,0.6); }
+  #syncStatus.saving .dot { background: var(--amber); box-shadow: 0 0 8px rgba(251,191,36,0.6); }
+  #syncStatus.error .dot { background: var(--red); box-shadow: 0 0 8px rgba(248,113,113,0.6); }
+  #driveLink { font-size: 12px; color: var(--text-dim); text-decoration: none; }
+  #driveLink:hover { color: var(--accent); }
 
-  .card { background: var(--panel); border: 1px solid var(--border); border-radius: var(--radius); padding: 18px; margin-bottom: 18px; }
-  .card h2 { margin: 0 0 14px; font-size: 16px; }
-  label { display: block; font-size: 13px; color: var(--text-dim); margin-bottom: 5px; margin-top: 12px; }
-  label:first-child { margin-top: 0; }
+  /* ---------- Cards ---------- */
+  .card {
+    background: var(--panel); border: 1px solid var(--border); border-radius: var(--radius);
+    padding: 20px; margin-bottom: 18px; box-shadow: var(--shadow); backdrop-filter: blur(6px);
+  }
+  .card h2 { margin: 0 0 16px; font-size: 15px; font-weight: 700; letter-spacing: -0.01em; }
+
+  /* ---------- Stats ---------- */
+  .stats-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-bottom: 18px; }
+  .stat {
+    background: var(--panel); border: 1px solid var(--border); border-radius: var(--radius);
+    padding: 14px 16px;
+  }
+  .stat .num { font-size: 24px; font-weight: 800; letter-spacing: -0.02em; }
+  .stat .lbl { font-size: 11px; color: var(--text-dim); margin-top: 2px; text-transform: uppercase; letter-spacing: 0.06em; font-weight: 600; }
+  .stat.s-blue .num { color: #a5b4fc; }
+  .stat.s-amber .num { color: var(--amber); }
+  .stat.s-green .num { color: var(--green); }
+  .stat.s-red .num { color: var(--red); }
+
+  /* ---------- Forms ---------- */
+  label { display: block; font-size: 12px; color: var(--text-dim); margin-bottom: 6px; margin-top: 14px; font-weight: 600; letter-spacing: 0.02em; }
+  label:first-of-type { margin-top: 0; }
   input[type=text], textarea, input[type=date], input[type=url], select {
     width: 100%; background: var(--panel-2); border: 1px solid var(--border); color: var(--text);
-    padding: 10px 12px; border-radius: 8px; font-size: 14px; font-family: inherit;
+    padding: 11px 13px; border-radius: 10px; font-size: 14px; font-family: inherit;
+    transition: border-color .12s ease;
   }
-  textarea { resize: vertical; min-height: 70px; }
+  textarea { resize: vertical; min-height: 76px; }
   input:focus, textarea:focus, select:focus { outline: none; border-color: var(--accent); }
-  .form-row { display: flex; gap: 12px; }
+  .form-row { display: flex; gap: 14px; }
   .form-row > div { flex: 1; }
 
   .btn {
-    background: var(--accent); color: #fff; border: none; padding: 10px 18px; border-radius: 8px;
-    font-size: 14px; font-weight: 600; cursor: pointer; margin-top: 14px;
+    background: var(--accent-grad); color: #fff; border: none; padding: 11px 20px; border-radius: 10px;
+    font-size: 14px; font-weight: 700; cursor: pointer; margin-top: 16px; font-family: inherit;
+    transition: transform .12s ease, box-shadow .12s ease; letter-spacing: 0.01em;
   }
-  .btn:hover { opacity: 0.9; }
-  .btn.secondary { background: var(--panel-2); border: 1px solid var(--border); color: var(--text); }
-  .btn.small { padding: 6px 12px; font-size: 13px; margin-top: 0; }
-  .btn:disabled { opacity: 0.5; cursor: not-allowed; }
+  .btn:hover { transform: translateY(-1px); box-shadow: 0 6px 18px rgba(99,102,241,0.35); }
+  .btn.secondary { background: var(--panel-2); border: 1px solid var(--border); color: var(--text); box-shadow: none; }
+  .btn.danger { background: rgba(248,113,113,0.12); border: 1px solid rgba(248,113,113,0.4); color: var(--red); box-shadow: none; }
+  .btn.small { padding: 7px 13px; font-size: 13px; margin-top: 0; }
+  .btn:disabled { opacity: 0.45; cursor: not-allowed; transform: none; box-shadow: none; }
 
-  .tabs { display: flex; gap: 8px; margin-bottom: 16px; flex-wrap: wrap; }
-  .tab { padding: 8px 16px; border-radius: 8px; cursor: pointer; font-size: 14px; background: var(--panel-2); border: 1px solid var(--border); color: var(--text-dim); }
-  .tab.active { background: var(--accent); color: #fff; border-color: var(--accent); }
+  /* ---------- Tabs ---------- */
+  .tabs { display: flex; gap: 8px; margin-bottom: 12px; flex-wrap: wrap; }
+  .tab {
+    padding: 8px 15px; border-radius: 9px; cursor: pointer; font-size: 13px; font-weight: 600;
+    background: var(--panel-2); border: 1px solid var(--border); color: var(--text-dim);
+    transition: all .12s ease; user-select: none;
+  }
+  .tab:hover { color: var(--text); }
+  .tab.active { background: var(--accent-grad); color: #fff; border-color: transparent; }
 
-  .section-title { font-size: 15px; font-weight: 600; margin: 24px 0 12px; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.5px; }
+  .section-title { font-size: 12px; font-weight: 700; margin: 26px 0 12px; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.08em; }
 
-  .task { background: var(--panel); border: 1px solid var(--border); border-radius: var(--radius); padding: 16px; margin-bottom: 12px; }
-  .task.priority-high { border-left: 3px solid var(--danger); }
-  .task.priority-medium { border-left: 3px solid var(--warn); }
-  .task.priority-low { border-left: 3px solid var(--text-dim); }
-  .task-top { display: flex; justify-content: space-between; align-items: flex-start; gap: 10px; }
-  .task-title { font-size: 15px; font-weight: 600; margin: 0 0 4px; }
-  .task-desc { font-size: 13px; color: var(--text-dim); margin: 0 0 10px; white-space: pre-wrap; }
-  .meta-row { display: flex; gap: 14px; flex-wrap: wrap; font-size: 12px; color: var(--text-dim); margin-bottom: 10px; align-items: center; }
-  .pill { font-size: 11px; padding: 3px 10px; border-radius: 20px; font-weight: 600; white-space: nowrap; }
-  .status-not_started { background: #3a2f1a; color: var(--warn); }
-  .status-in_progress { background: #1a2f3a; color: var(--accent); }
-  .status-done { background: #1a3a2a; color: var(--accent-2); }
-  .prio-high { background: #3a1a1a; color: var(--danger); }
-  .prio-medium { background: #3a2f1a; color: var(--warn); }
-  .prio-low { background: #23262e; color: var(--text-dim); }
+  /* ---------- Tasks ---------- */
+  .task {
+    background: var(--panel); border: 1px solid var(--border); border-radius: var(--radius);
+    padding: 18px; margin-bottom: 12px; box-shadow: var(--shadow);
+    transition: border-color .12s ease;
+  }
+  .task:hover { border-color: #3a4150; }
+  .task.priority-high { border-left: 3px solid var(--red); }
+  .task.priority-medium { border-left: 3px solid var(--amber); }
+  .task.priority-low { border-left: 3px solid #4b5563; }
+  .task-top { display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; }
+  .task-title { font-size: 15px; font-weight: 700; margin: 0 0 5px; letter-spacing: -0.01em; }
+  .task-desc { font-size: 13px; color: var(--text-dim); margin: 0 0 12px; white-space: pre-wrap; line-height: 1.5; }
+  .meta-row { display: flex; gap: 16px; flex-wrap: wrap; font-size: 12px; color: var(--text-dim); margin-bottom: 8px; align-items: center; }
+  .meta-row a { color: #a5b4fc; text-decoration: none; }
+  .meta-row a:hover { text-decoration: underline; }
+  .overdue { color: var(--red); font-weight: 700; }
 
-  .task-actions { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 10px; align-items: center; }
-  .link-box { margin-top: 10px; padding: 10px; background: var(--panel-2); border-radius: 8px; font-size: 13px; word-break: break-all; }
-  .link-box a { color: var(--accent); }
-  .empty-state { text-align: center; color: var(--text-dim); padding: 40px 20px; font-size: 14px; }
+  .pills { display: flex; flex-direction: column; gap: 6px; align-items: flex-end; flex-shrink: 0; }
+  .pill { font-size: 11px; padding: 4px 11px; border-radius: 20px; font-weight: 700; white-space: nowrap; display: inline-flex; align-items: center; gap: 6px; }
+  .pill .pdot { width: 6px; height: 6px; border-radius: 50%; }
+  .status-not_started { background: rgba(251,191,36,0.12); color: var(--amber); }
+  .status-not_started .pdot { background: var(--amber); }
+  .status-in_progress { background: rgba(99,102,241,0.14); color: #a5b4fc; }
+  .status-in_progress .pdot { background: #a5b4fc; }
+  .status-done { background: rgba(52,211,153,0.13); color: var(--green); }
+  .status-done .pdot { background: var(--green); }
+  .prio-high { background: rgba(248,113,113,0.12); color: var(--red); }
+  .prio-medium { background: rgba(251,191,36,0.12); color: var(--amber); }
+  .prio-low { background: rgba(75,85,99,0.25); color: #9ca3af; }
 
-  /* Leaderboard */
-  .lb-row { display: flex; align-items: center; gap: 12px; padding: 10px 0; border-bottom: 1px solid var(--border); }
+  .task-actions { display: flex; gap: 9px; flex-wrap: wrap; margin-top: 12px; align-items: center; }
+  .task-actions input[type=url] { flex: 1; min-width: 190px; }
+  .link-box {
+    margin-top: 12px; padding: 11px 13px; background: rgba(52,211,153,0.08);
+    border: 1px solid rgba(52,211,153,0.25); border-radius: 10px; font-size: 13px; word-break: break-all;
+  }
+  .link-box a { color: var(--green); font-weight: 600; }
+  .empty-state { text-align: center; color: var(--text-dim); padding: 48px 20px; font-size: 14px; line-height: 1.6; }
+
+  /* ---------- Leaderboard ---------- */
+  .lb-row { display: flex; align-items: center; gap: 14px; padding: 12px 0; border-bottom: 1px solid var(--border); }
   .lb-row:last-child { border-bottom: none; }
-  .lb-rank { width: 24px; font-weight: 700; color: var(--text-dim); }
-  .lb-rank.gold { color: var(--gold); }
-  .lb-name { flex: 1; font-size: 14px; }
-  .lb-points { font-weight: 700; color: var(--accent-2); font-size: 14px; }
+  .lb-rank { width: 30px; font-weight: 800; color: var(--text-dim); font-size: 15px; text-align: center; }
+  .lb-name { flex: 1; font-size: 14px; font-weight: 600; }
+  .lb-sub { font-size: 12px; color: var(--text-dim); font-weight: 400; }
+  .lb-points { font-weight: 800; color: var(--green); font-size: 15px; }
 
-  /* Onboarding modal */
+  /* ---------- Score card ---------- */
+  .score-flex { display: flex; align-items: baseline; gap: 14px; }
+  .score-big { font-size: 40px; font-weight: 800; color: var(--green); letter-spacing: -0.03em; line-height: 1; }
+  .score-sub { font-size: 13px; color: var(--text-dim); }
+
+  /* ---------- Onboarding modal ---------- */
   #onboardOverlay {
-    display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.7); z-index: 999;
-    align-items: center; justify-content: center; padding: 20px;
+    display: none; position: fixed; inset: 0; background: rgba(5,7,10,0.75); z-index: 999;
+    align-items: center; justify-content: center; padding: 20px; backdrop-filter: blur(4px);
   }
   #onboardModal {
-    background: var(--panel); border: 1px solid var(--border); border-radius: var(--radius);
-    max-width: 480px; width: 100%; padding: 24px; max-height: 85vh; overflow-y: auto;
+    background: var(--panel); border: 1px solid var(--border); border-radius: 18px;
+    max-width: 480px; width: 100%; padding: 28px; max-height: 85vh; overflow-y: auto; box-shadow: var(--shadow);
   }
-  #onboardModal h2 { margin-top: 0; }
-  .onboard-item { display: flex; gap: 10px; align-items: flex-start; padding: 10px 0; border-bottom: 1px solid var(--border); }
-  .onboard-item:last-child { border-bottom: none; }
-  .onboard-item input { width: auto; margin-top: 3px; }
-  .onboard-item p { margin: 0; font-size: 14px; }
-  .onboard-item span { font-size: 12px; color: var(--text-dim); }
+  #onboardModal h2 { margin: 0 0 4px; font-size: 20px; }
+  #onboardModal .sub { color: var(--text-dim); font-size: 13px; margin: 0 0 18px; }
+  .onboard-item { display: flex; gap: 12px; align-items: flex-start; padding: 12px 0; border-bottom: 1px solid var(--border); }
+  .onboard-item:last-of-type { border-bottom: none; }
+  .onboard-item input { width: 17px; height: 17px; margin-top: 2px; accent-color: var(--accent); cursor: pointer; }
+  .onboard-item p { margin: 0; font-size: 14px; font-weight: 600; }
+  .onboard-item span { font-size: 12px; color: var(--text-dim); line-height: 1.5; }
 
-  select.status-select { width: auto; padding: 6px 10px; font-size: 13px; }
+  /* ---------- Toasts ---------- */
+  #toasts { position: fixed; bottom: 20px; right: 20px; z-index: 1000; display: flex; flex-direction: column; gap: 10px; max-width: 320px; }
+  .toast {
+    background: var(--panel-2); border: 1px solid var(--border); border-radius: 12px;
+    padding: 12px 16px; font-size: 13px; box-shadow: var(--shadow); animation: slideIn .2s ease;
+  }
+  .toast.ok { border-color: rgba(52,211,153,0.4); }
+  .toast.warn { border-color: rgba(251,191,36,0.4); }
+  .toast.err { border-color: rgba(248,113,113,0.4); }
+  @keyframes slideIn { from { transform: translateX(20px); opacity: 0; } to { transform: none; opacity: 1; } }
 
-  @media (max-width: 480px) {
+  @media (max-width: 560px) {
     header { flex-direction: column; align-items: flex-start; }
     .form-row { flex-direction: column; gap: 0; }
+    .stats-row { grid-template-columns: repeat(2, 1fr); }
+    .pills { flex-direction: row; }
+    .task-top { flex-direction: column; }
   }
 </style>
 </head>
 <body>
 
+<!-- ============ LOGIN ============ -->
 <div id="loginScreen">
-  <h1>🎬 Video Task Dashboard</h1>
-  <p>Sign in with Google to sync your tasks</p>
-  <button class="google-btn" onclick="startLogin()">
-    <svg width="18" height="18" viewBox="0 0 48 48"><path fill="#FFC107" d="M43.6 20.5H42V20H24v8h11.3c-1.6 4.6-6 8-11.3 8-6.6 0-12-5.4-12-12s5.4-12 12-12c3.1 0 5.9 1.2 8 3.1l5.7-5.7C34.6 6 29.6 4 24 4 12.9 4 4 12.9 4 24s8.9 20 20 20 20-8.9 20-20c0-1.3-.1-2.7-.4-3.5z"/><path fill="#FF3D00" d="M6.3 14.7l6.6 4.8C14.6 15.9 18.9 13 24 13c3.1 0 5.9 1.2 8 3.1l5.7-5.7C34.6 6 29.6 4 24 4 16.3 4 9.7 8.3 6.3 14.7z"/><path fill="#4CAF50" d="M24 44c5.5 0 10.4-1.9 14.2-5.1l-6.5-5.5C29.7 35 27 36 24 36c-5.3 0-9.7-3.4-11.3-8l-6.6 5C9.6 39.6 16.2 44 24 44z"/><path fill="#1976D2" d="M43.6 20.5H42V20H24v8h11.3c-.8 2.3-2.2 4.3-4.1 5.7l6.5 5.5C41.4 36 44 30.5 44 24c0-1.3-.1-2.7-.4-3.5z"/></svg>
-    Sign in with Google
-  </button>
-  <div id="loginLoading">Signing in...</div>
-  <p id="loginError" style="color:#ff6b6b; margin-top:16px; font-size:13px;"></p>
-</div>
-
-<div id="onboardOverlay">
-  <div id="onboardModal">
-    <h2>👋 Welcome!</h2>
-    <p style="color:var(--text-dim); font-size:14px;">Please review this checklist before you start working:</p>
-    <div id="onboardList"></div>
-    <button class="btn" onclick="completeOnboarding()" style="width:100%;">Got it, let's get started</button>
+  <div class="login-card">
+    <div class="logo-mark">🎬</div>
+    <h1>Video Task Dashboard</h1>
+    <p>Sign in with Google to sync your tasks</p>
+    <button class="google-btn" onclick="startLogin()">
+      <svg width="18" height="18" viewBox="0 0 48 48"><path fill="#FFC107" d="M43.6 20.5H42V20H24v8h11.3c-1.6 4.6-6 8-11.3 8-6.6 0-12-5.4-12-12s5.4-12 12-12c3.1 0 5.9 1.2 8 3.1l5.7-5.7C34.6 6 29.6 4 24 4 12.9 4 4 12.9 4 24s8.9 20 20 20 20-8.9 20-20c0-1.3-.1-2.7-.4-3.5z"/><path fill="#FF3D00" d="M6.3 14.7l6.6 4.8C14.6 15.9 18.9 13 24 13c3.1 0 5.9 1.2 8 3.1l5.7-5.7C34.6 6 29.6 4 24 4 16.3 4 9.7 8.3 6.3 14.7z"/><path fill="#4CAF50" d="M24 44c5.5 0 10.4-1.9 14.2-5.1l-6.5-5.5C29.7 35 27 36 24 36c-5.3 0-9.7-3.4-11.3-8l-6.6 5C9.6 39.6 16.2 44 24 44z"/><path fill="#1976D2" d="M43.6 20.5H42V20H24v8h11.3c-.8 2.3-2.2 4.3-4.1 5.7l6.5 5.5C41.4 36 44 30.5 44 24c0-1.3-.1-2.7-.4-3.5z"/></svg>
+      Sign in with Google
+    </button>
+    <div id="loginLoading">Signing in…</div>
+    <p id="loginError"></p>
   </div>
 </div>
 
+<!-- ============ ONBOARDING ============ -->
+<div id="onboardOverlay">
+  <div id="onboardModal">
+    <h2>👋 Welcome!</h2>
+    <p class="sub">Please review this checklist before you start working:</p>
+    <div id="onboardList"></div>
+    <button class="btn" id="obDoneBtn" onclick="completeOnboarding()" style="width:100%;" disabled>Got it, let's get started</button>
+  </div>
+</div>
+
+<!-- ============ APP ============ -->
 <div id="app" class="container" style="display:none;">
   <header>
-    <div class="title">🎬 Video Task Dashboard <span class="badge" id="roleBadge"></span></div>
+    <div class="brand">
+      <div class="mini-mark">🎬</div>
+      <span class="title">Video Task Dashboard</span>
+      <span class="badge" id="roleBadge"></span>
+    </div>
     <div class="userinfo">
       <img class="avatar" id="userAvatar" src="" alt="" />
       <span id="userName"></span>
@@ -178,18 +287,26 @@
     </div>
   </header>
 
-  <div id="syncStatus"><span class="dot"></span><span id="syncText">Synced with Google Drive</span></div>
+  <div class="sync-row">
+    <div id="syncStatus"><span class="dot"></span><span id="syncText">Connecting…</span></div>
+    <a id="driveLink" href="#" target="_blank" style="display:none;">Open data file in Drive ↗</a>
+  </div>
+
+  <div class="stats-row" id="statsRow" style="display:none;"></div>
 
   <div id="myScoreCard" style="display:none;" class="card">
     <h2>🏆 This Month's Points</h2>
-    <div style="font-size:32px; font-weight:700; color:var(--accent-2);" id="myScoreValue">0</div>
+    <div class="score-flex">
+      <div class="score-big" id="myScoreValue">0</div>
+      <div class="score-sub" id="myScoreSub"></div>
+    </div>
   </div>
 
   <div id="adminSection" style="display:none;">
     <div class="card">
       <h2>➕ Assign a New Task</h2>
       <label>Task Title *</label>
-      <input type="text" id="taskTitle" placeholder="e.g. Instagram Reel - Product Launch" />
+      <input type="text" id="taskTitle" placeholder="e.g. Instagram Reel — Product Launch" />
 
       <label>Description / Instructions</label>
       <textarea id="taskDesc" placeholder="What needs to be done, where the footage is, style reference, etc."></textarea>
@@ -203,9 +320,9 @@
         <div>
           <label>Priority</label>
           <select id="taskPriority">
-            <option value="high">High</option>
-            <option value="medium" selected>Medium</option>
-            <option value="low">Low</option>
+            <option value="high">🔴 High (30 pts)</option>
+            <option value="medium" selected>🟡 Medium (20 pts)</option>
+            <option value="low">⚪ Low (10 pts)</option>
           </select>
         </div>
       </div>
@@ -217,7 +334,7 @@
         </div>
         <div>
           <label>Reference Link (optional)</label>
-          <input type="url" id="taskRefLink" placeholder="https://drive.google.com/..." />
+          <input type="url" id="taskRefLink" placeholder="https://drive.google.com/…" />
         </div>
       </div>
 
@@ -225,19 +342,19 @@
     </div>
   </div>
 
-  <div id="leaderboardSection" style="display:none;" class="card">
+  <div id="leaderboardSection" class="card">
     <h2>🏆 Monthly Leaderboard</h2>
     <div id="leaderboardList"></div>
   </div>
 
   <div class="section-title">Tasks</div>
-  <div class="tabs">
+  <div class="tabs" id="statusTabs">
     <div class="tab active" data-filter="all" onclick="setFilter('all')">All</div>
     <div class="tab" data-filter="not_started" onclick="setFilter('not_started')">Not Started</div>
     <div class="tab" data-filter="in_progress" onclick="setFilter('in_progress')">In Progress</div>
-    <div class="tab" data-filter="done" onclick="setFilter('done')">Done</div>
+    <div class="tab" data-filter="done" onclick="setFilter('done')">Completed</div>
   </div>
-  <div class="tabs">
+  <div class="tabs" id="prioTabs">
     <div class="tab active" data-pfilter="all" onclick="setPriorityFilter('all')">All Priority</div>
     <div class="tab" data-pfilter="high" onclick="setPriorityFilter('high')">🔴 High</div>
     <div class="tab" data-pfilter="medium" onclick="setPriorityFilter('medium')">🟡 Medium</div>
@@ -247,300 +364,342 @@
   <div id="taskList"></div>
 </div>
 
+<div id="toasts"></div>
+
 <script>
-/* ================= CONFIG ================= */
+/* ==================== CONFIG ==================== */
 const CLIENT_ID = "934969728739-6d3t3nta7bdpoeodsmoqbto24l92taol.apps.googleusercontent.com";
 const ADMIN_EMAIL = "mohit@servevision.io";
-const OAUTH_SCOPE = "https://www.googleapis.com/auth/drive.file https://www.googleapis.com/auth/userinfo.email https://www.googleapis.com/auth/userinfo.profile";
+const SCOPES = "https://www.googleapis.com/auth/drive https://www.googleapis.com/auth/userinfo.email https://www.googleapis.com/auth/userinfo.profile";
 const DATA_FILENAME = "video-task-dashboard-data.json";
-const PRIORITY_POINTS = { high: 30, medium: 20, low: 10 };
-const STORAGE_KEY = "vtd_session_v1";
+const POINTS = { high: 30, medium: 20, low: 10 };
+const STORAGE_KEY = "vtd_session_v3";
+const POLL_MS = 20000;
 
 const ONBOARDING_ITEMS = [
   { title: "Read task instructions carefully", desc: "Every task's description includes the deadline and reference links." },
   { title: "Flag delays early", desc: "Let the admin know as soon as possible if a deadline will be missed." },
   { title: "Submit only the final, working video link", desc: "Make sure the link is shareable before marking a task complete." },
-  { title: "Work by priority", desc: "Complete High priority tasks first." },
+  { title: "Work by priority", desc: "Complete High priority tasks first — they're worth the most points." },
 ];
 
-/* ================= STATE ================= */
+/* ==================== STATE ==================== */
 let accessToken = null;
 let tokenExpiry = 0;
 let currentUser = null;
-let tasks = [];
+let isAdminUser = false;
 let dataFileId = null;
+let dataStore = { version: 3, tasks: [], users: {}, sharedWith: [] };
 let currentFilter = "all";
 let currentPriorityFilter = "all";
 let tokenClient = null;
-let isAdminUser = false;
+let pollTimer = null;
+let pendingDeleteId = null;
+let pendingDeleteTimer = null;
 
-function normEmail(e) { return (e || "").trim().toLowerCase(); }
+const normEmail = (e) => (e || "").trim().toLowerCase();
+const nowISO = () => new Date().toISOString();
+const monthKey = (iso) => (iso || nowISO()).slice(0, 7);
 
-/* ================= AUTH ================= */
-window.onload = () => {
-  tokenClient = google.accounts.oauth2.initTokenClient({
-    client_id: CLIENT_ID,
-    scope: OAUTH_SCOPE,
-    callback: onTokenResponse,
-  });
-
-  // Try silent restore from cached session
-  const cached = localStorage.getItem(STORAGE_KEY);
-  if (cached) {
-    try {
-      const session = JSON.parse(cached);
-      if (session.expiry > Date.now()) {
-        accessToken = session.accessToken;
-        tokenExpiry = session.expiry;
-        currentUser = session.user;
-        initApp();
-        return;
-      }
-    } catch (e) { /* ignore corrupt cache */ }
-  }
-};
-
-function startLogin() {
-  document.getElementById("loginLoading").style.display = "block";
-  document.getElementById("loginError").textContent = "";
-  tokenClient.requestAccessToken({ prompt: "consent" });
+/* ==================== TOASTS ==================== */
+function toast(msg, kind) {
+  const el = document.createElement("div");
+  el.className = "toast " + (kind || "");
+  el.textContent = msg;
+  document.getElementById("toasts").appendChild(el);
+  setTimeout(() => { el.style.opacity = "0"; el.style.transition = "opacity .3s"; }, 2600);
+  setTimeout(() => el.remove(), 3000);
 }
 
-async function onTokenResponse(tokenResponse) {
-  if (tokenResponse.error) {
+/* ==================== AUTH ==================== */
+function startLogin() {
+  if (!window.google || !google.accounts || !google.accounts.oauth2) {
+    document.getElementById("loginError").textContent = "Google sign-in is still loading — try again in a second.";
+    return;
+  }
+  document.getElementById("loginLoading").style.display = "block";
+  document.getElementById("loginError").textContent = "";
+  if (!tokenClient) {
+    tokenClient = google.accounts.oauth2.initTokenClient({
+      client_id: CLIENT_ID,
+      scope: SCOPES,
+      callback: onTokenResponse,
+    });
+  }
+  tokenClient.requestAccessToken({ prompt: "" });
+}
+
+async function onTokenResponse(tr) {
+  if (tr.error) {
     document.getElementById("loginLoading").style.display = "none";
     document.getElementById("loginError").textContent = "Login was cancelled or permission was not granted. Please try again.";
     return;
   }
-  accessToken = tokenResponse.access_token;
-  tokenExpiry = Date.now() + (tokenResponse.expires_in - 60) * 1000;
-
+  accessToken = tr.access_token;
+  tokenExpiry = Date.now() + Math.max(0, (tr.expires_in - 60)) * 1000;
   try {
     const res = await fetch("https://www.googleapis.com/oauth2/v3/userinfo", {
-      headers: { Authorization: `Bearer ${accessToken}` },
+      headers: { Authorization: "Bearer " + accessToken },
     });
-    const profile = await res.json();
-    currentUser = { email: profile.email, name: profile.name, picture: profile.picture };
-
+    const p = await res.json();
+    currentUser = { email: normEmail(p.email), name: p.name || p.email, picture: p.picture || "" };
     localStorage.setItem(STORAGE_KEY, JSON.stringify({ accessToken, expiry: tokenExpiry, user: currentUser }));
-
     document.getElementById("loginLoading").style.display = "none";
     await initApp();
-  } catch (err) {
+  } catch (e) {
     document.getElementById("loginLoading").style.display = "none";
     document.getElementById("loginError").textContent = "Could not load profile. Please try again.";
   }
 }
 
+function restoreSession() {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if (!raw) return false;
+    const s = JSON.parse(raw);
+    if (!s.accessToken || !s.expiry || s.expiry < Date.now()) return false;
+    accessToken = s.accessToken;
+    tokenExpiry = s.expiry;
+    currentUser = s.user;
+    return true;
+  } catch (e) { return false; }
+}
+
 function logout() {
   localStorage.removeItem(STORAGE_KEY);
-  accessToken = null;
-  currentUser = null;
+  accessToken = null; currentUser = null; dataFileId = null;
+  if (pollTimer) clearInterval(pollTimer);
   document.getElementById("app").style.display = "none";
   document.getElementById("loginScreen").style.display = "flex";
 }
 
-/* ================= APP INIT ================= */
+function handleSessionExpired() {
+  localStorage.removeItem(STORAGE_KEY);
+  accessToken = null;
+  if (pollTimer) clearInterval(pollTimer);
+  document.getElementById("app").style.display = "none";
+  document.getElementById("loginScreen").style.display = "flex";
+  document.getElementById("loginError").textContent = "Session expired — please sign in again.";
+}
+
+async function driveFetch(url, opts) {
+  opts = opts || {};
+  const headers = Object.assign({}, opts.headers || {}, { Authorization: "Bearer " + accessToken });
+  const res = await fetch(url, Object.assign({}, opts, { headers }));
+  if (res.status === 401) { handleSessionExpired(); throw new Error("unauthorized"); }
+  return res;
+}
+
+window.addEventListener("load", () => {
+  if (restoreSession()) initApp();
+});
+
+/* ==================== INIT ==================== */
 async function initApp() {
   document.getElementById("loginScreen").style.display = "none";
   document.getElementById("app").style.display = "block";
-
-  document.getElementById("userAvatar").src = currentUser.picture || "";
-  document.getElementById("userName").textContent = currentUser.name || currentUser.email;
+  document.getElementById("userAvatar").src = currentUser.picture;
+  document.getElementById("userName").textContent = currentUser.name;
 
   isAdminUser = normEmail(currentUser.email) === normEmail(ADMIN_EMAIL);
   document.getElementById("roleBadge").textContent = isAdminUser ? "Admin" : "Editor";
   document.getElementById("adminSection").style.display = isAdminUser ? "block" : "none";
-  document.getElementById("leaderboardSection").style.display = "block";
   document.getElementById("myScoreCard").style.display = isAdminUser ? "none" : "block";
+  document.getElementById("statsRow").style.display = isAdminUser ? "grid" : "none";
 
-  await loadDataFromDrive();
-  ensureUserRecord();
+  await syncFromDrive(true);
 
-  if (!isAdminUser && !(dataStore.users[normEmail(currentUser.email)] || {}).onboardingComplete) {
-    showOnboarding();
+  if (!isAdminUser && dataFileId) {
+    const me = dataStore.users[normEmail(currentUser.email)];
+    if (!me || !me.onboardingComplete) showOnboarding();
   }
 
-  renderLeaderboard();
-  renderMyScore();
-  renderTasks();
-  renderKnownEditors();
-
-  // Auto-refresh from Drive every 20s so changes made elsewhere show up
-  setInterval(async () => {
-    await loadDataFromDrive();
-    ensureUserRecord();
-    renderLeaderboard();
-    renderMyScore();
-    renderTasks();
-    renderKnownEditors();
-  }, 20000);
+  if (pollTimer) clearInterval(pollTimer);
+  pollTimer = setInterval(() => syncFromDrive(false), POLL_MS);
 }
 
-function renderKnownEditors() {
-  const dl = document.getElementById("knownEditors");
-  if (!dl) return;
-  const emails = Object.keys(dataStore.users || {}).filter((e) => e !== normEmail(ADMIN_EMAIL));
-  dl.innerHTML = emails.map((e) => `<option value="${escapeAttr(e)}">${escapeAttr((dataStore.users[e] && dataStore.users[e].name) || "")}</option>`).join("");
-}
-
-let dataStore = { tasks: [], users: {}, scores: {} };
-
-function ensureUserRecord() {
-  const key = normEmail(currentUser.email);
-  if (!dataStore.users[key]) {
-    dataStore.users[key] = { name: currentUser.name, onboardingComplete: false };
-    saveDataToDrive();
-  } else {
-    dataStore.users[key].name = currentUser.name;
-  }
-}
-
-/* ================= ONBOARDING ================= */
-function showOnboarding() {
-  const list = document.getElementById("onboardList");
-  list.innerHTML = ONBOARDING_ITEMS.map((item, i) => `
-    <div class="onboard-item">
-      <input type="checkbox" id="ob_${i}" />
-      <div>
-        <p>${escapeHtml(item.title)}</p>
-        <span>${escapeHtml(item.desc)}</span>
-      </div>
-    </div>
-  `).join("");
-  document.getElementById("onboardOverlay").style.display = "flex";
-}
-
-function completeOnboarding() {
-  const key = normEmail(currentUser.email);
-  dataStore.users[key].onboardingComplete = true;
-  saveDataToDrive();
-  document.getElementById("onboardOverlay").style.display = "none";
-}
-
-/* ================= DRIVE STORAGE ================= */
+/* ==================== DRIVE ==================== */
 async function findDataFile() {
-  const q = encodeURIComponent(`name='${DATA_FILENAME}' and trashed=false`);
-  const res = await fetch(
-    `https://www.googleapis.com/drive/v3/files?q=${q}&fields=files(id,name)`,
-    { headers: { Authorization: `Bearer ${accessToken}` } }
+  const q = encodeURIComponent(
+    "name='" + DATA_FILENAME + "' and trashed=false and '" + ADMIN_EMAIL + "' in owners"
+  );
+  const res = await driveFetch(
+    "https://www.googleapis.com/drive/v3/files?q=" + q +
+    "&fields=files(id,name,createdTime)&orderBy=createdTime&supportsAllDrives=true&includeItemsFromAllDrives=true"
   );
   const data = await res.json();
-  if (data.files && data.files.length > 0) return data.files[0].id;
-  return null;
+  return (data.files && data.files[0] && data.files[0].id) || null;
 }
 
-async function loadDataFromDrive() {
-  setSyncStatus("saving", "Loading from Drive...");
+async function fetchFileContent() {
+  const res = await driveFetch(
+    "https://www.googleapis.com/drive/v3/files/" + dataFileId + "?alt=media&supportsAllDrives=true"
+  );
+  if (!res.ok) throw new Error("fetch failed " + res.status);
+  return res.json();
+}
+
+function adoptRemote(json) {
+  dataStore = {
+    version: 3,
+    tasks: Array.isArray(json.tasks) ? json.tasks : [],
+    users: json.users || {},
+    sharedWith: Array.isArray(json.sharedWith) ? json.sharedWith : [],
+  };
+}
+
+async function syncFromDrive(isFirst) {
+  setSync("saving", isFirst ? "Loading…" : "Syncing…");
   try {
-    dataFileId = await findDataFile();
-    if (dataFileId) {
-      const res = await fetch(
-        `https://www.googleapis.com/drive/v3/files/${dataFileId}?alt=media`,
-        { headers: { Authorization: `Bearer ${accessToken}` } }
-      );
-      const json = await res.json();
-      dataStore = {
-        tasks: json.tasks || [],
-        users: json.users || {},
-        scores: json.scores || {},
-      };
-      tasks = dataStore.tasks;
+    if (!dataFileId) dataFileId = await findDataFile();
+
+    if (!dataFileId) {
+      if (isAdminUser) {
+        await createDataFile();
+        setSync("ok", "Synced with Google Drive");
+      } else {
+        setSync("ok", "Waiting for your first task");
+        renderAll();
+        return;
+      }
     } else {
-      dataStore = { tasks: [], users: {}, scores: {} };
-      tasks = [];
-      await saveDataToDrive();
+      adoptRemote(await fetchFileContent());
+      setSync("ok", "Synced with Google Drive");
     }
-    setSyncStatus("ok", "Synced with Google Drive");
-  } catch (err) {
-    console.error(err);
-    setSyncStatus("error", "Could not load from Drive");
+
+    ensureUserRecord();
+    updateDriveLink();
+    renderAll();
+  } catch (e) {
+    if (e.message === "unauthorized") return;
+    console.error(e);
+    setSync("error", "Sync problem — will retry");
   }
 }
 
-async function saveDataToDrive() {
-  setSyncStatus("saving", "Saving...");
+async function createDataFile() {
+  const metadata = { name: DATA_FILENAME, mimeType: "application/json" };
+  const boundary = "vtdb" + Date.now();
+  const body =
+    "--" + boundary + "\r\nContent-Type: application/json; charset=UTF-8\r\n\r\n" +
+    JSON.stringify(metadata) +
+    "\r\n--" + boundary + "\r\nContent-Type: application/json\r\n\r\n" +
+    JSON.stringify(dataStore) +
+    "\r\n--" + boundary + "--";
+  const res = await driveFetch(
+    "https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart&fields=id",
+    { method: "POST", headers: { "Content-Type": "multipart/related; boundary=" + boundary }, body }
+  );
+  const data = await res.json();
+  dataFileId = data.id;
+}
 
-  // Refetch the latest version from Drive first, so we merge on top of
-  // anyone else's more recent changes instead of overwriting them.
+function mergeTasks(remote, local) {
+  const map = new Map();
+  remote.concat(local).forEach((t) => {
+    if (!t || !t.id) return;
+    const ex = map.get(t.id);
+    if (!ex || new Date(t.updatedAt || 0) > new Date(ex.updatedAt || 0)) map.set(t.id, t);
+  });
+  return Array.from(map.values());
+}
+
+function mergeUsers(remote, local) {
+  const out = {};
+  const keys = new Set(Object.keys(remote).concat(Object.keys(local)));
+  keys.forEach((k) => {
+    const r = remote[k] || {}, l = local[k] || {};
+    out[k] = {
+      name: l.name || r.name || k,
+      onboardingComplete: !!(l.onboardingComplete || r.onboardingComplete),
+      firstSeen: r.firstSeen || l.firstSeen || nowISO(),
+    };
+  });
+  return out;
+}
+
+async function saveToDrive() {
+  if (!dataFileId) {
+    if (isAdminUser) { await createDataFile(); }
+    else { toast("No shared task file yet — ask the admin to assign you a task first.", "warn"); return; }
+  }
+  setSync("saving", "Saving…");
   try {
-    if (dataFileId) {
-      const res = await fetch(
-        `https://www.googleapis.com/drive/v3/files/${dataFileId}?alt=media`,
-        { headers: { Authorization: `Bearer ${accessToken}` } }
-      );
-      if (res.ok) {
-        const latest = await res.json();
-        const latestTasks = latest.tasks || [];
-        const localIds = new Set(tasks.map((t) => t.id));
+    // Merge with the latest remote copy first so we never overwrite others' changes
+    try {
+      const latest = await fetchFileContent();
+      dataStore.tasks = mergeTasks(latest.tasks || [], dataStore.tasks);
+      dataStore.users = mergeUsers(latest.users || {}, dataStore.users);
+      dataStore.sharedWith = Array.from(new Set((latest.sharedWith || []).concat(dataStore.sharedWith || [])));
+    } catch (e) {
+      if (e.message === "unauthorized") return;
+      console.warn("pre-save refetch failed; saving local copy", e);
+    }
 
-        // Keep remote tasks we don't know about locally, then overlay our local versions
-        const merged = latestTasks.filter((t) => !localIds.has(t.id));
-        tasks = [...tasks, ...merged];
+    const res = await driveFetch(
+      "https://www.googleapis.com/upload/drive/v3/files/" + dataFileId + "?uploadType=media&supportsAllDrives=true",
+      { method: "PATCH", headers: { "Content-Type": "application/json" }, body: JSON.stringify(dataStore) }
+    );
+    if (!res.ok) throw new Error("save failed " + res.status);
+    setSync("ok", "Synced with Google Drive");
+  } catch (e) {
+    if (e.message === "unauthorized") return;
+    console.error(e);
+    setSync("error", "Save failed — changes kept locally, will retry");
+  }
+}
 
-        dataStore.users = { ...(latest.users || {}), ...dataStore.users };
-        dataStore.scores = mergeScores(latest.scores || {}, dataStore.scores);
+async function shareFileWith(email) {
+  if (!dataFileId) return;
+  if ((dataStore.sharedWith || []).includes(email)) return;
+  try {
+    const res = await driveFetch(
+      "https://www.googleapis.com/drive/v3/files/" + dataFileId + "/permissions?sendNotificationEmail=false&supportsAllDrives=true",
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ role: "writer", type: "user", emailAddress: email }),
       }
+    );
+    if (res.ok) {
+      dataStore.sharedWith.push(email);
+      toast("Data file shared with " + email, "ok");
+    } else {
+      toast("Couldn't auto-share with " + email + " — share the data file manually from Drive.", "warn");
     }
   } catch (e) {
-    console.warn("Could not refetch before save, proceeding with local copy", e);
-  }
-
-  dataStore.tasks = tasks;
-  const content = JSON.stringify(dataStore, null, 2);
-  const blob = new Blob([content], { type: "application/json" });
-
-  try {
-    if (dataFileId) {
-      await fetch(
-        `https://www.googleapis.com/upload/drive/v3/files/${dataFileId}?uploadType=media`,
-        {
-          method: "PATCH",
-          headers: { Authorization: `Bearer ${accessToken}`, "Content-Type": "application/json" },
-          body: content,
-        }
-      );
-    } else {
-      const metadata = { name: DATA_FILENAME, mimeType: "application/json" };
-      const form = new FormData();
-      form.append("metadata", new Blob([JSON.stringify(metadata)], { type: "application/json" }));
-      form.append("file", blob);
-      const res = await fetch(
-        "https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart&fields=id",
-        { method: "POST", headers: { Authorization: `Bearer ${accessToken}` }, body: form }
-      );
-      const data = await res.json();
-      dataFileId = data.id;
-    }
-    setSyncStatus("ok", "Synced with Google Drive");
-  } catch (err) {
-    console.error(err);
-    setSyncStatus("error", "Save failed — retrying next change");
+    if (e.message !== "unauthorized")
+      toast("Couldn't auto-share with " + email + " — share the data file manually from Drive.", "warn");
   }
 }
 
-function mergeScores(remote, local) {
-  const result = {};
-  const emails = new Set([...Object.keys(remote), ...Object.keys(local)]);
-  emails.forEach((email) => {
-    const r = remote[email] || {};
-    const l = local[email] || {};
-    const months = new Set([...Object.keys(r), ...Object.keys(l)]);
-    result[email] = {};
-    months.forEach((m) => {
-      result[email][m] = Math.max(r[m] || 0, l[m] || 0);
-    });
-  });
-  return result;
+function ensureUserRecord() {
+  const k = normEmail(currentUser.email);
+  if (!dataStore.users[k]) {
+    dataStore.users[k] = { name: currentUser.name, onboardingComplete: false, firstSeen: nowISO() };
+    saveToDrive();
+  } else if (dataStore.users[k].name !== currentUser.name) {
+    dataStore.users[k].name = currentUser.name;
+  }
 }
 
-function setSyncStatus(state, text) {
+function updateDriveLink() {
+  const a = document.getElementById("driveLink");
+  if (isAdminUser && dataFileId) {
+    a.href = "https://drive.google.com/file/d/" + dataFileId + "/view";
+    a.style.display = "inline";
+  } else {
+    a.style.display = "none";
+  }
+}
+
+function setSync(state, text) {
   const el = document.getElementById("syncStatus");
   el.className = state === "ok" ? "" : state;
   document.getElementById("syncText").textContent = text;
 }
 
-/* ================= TASK LOGIC ================= */
+/* ==================== TASKS ==================== */
 function createTask() {
   const title = document.getElementById("taskTitle").value.trim();
   const desc = document.getElementById("taskDesc").value.trim();
@@ -549,209 +708,314 @@ function createTask() {
   const deadline = document.getElementById("taskDeadline").value;
   const refLink = document.getElementById("taskRefLink").value.trim();
 
-  if (!title) { alert("Task title is required"); return; }
-  if (!assignee || !assignee.includes("@")) { alert("Please enter a valid assignee email"); return; }
+  if (!title) { toast("Task title is required", "err"); return; }
+  if (!assignee || assignee.indexOf("@") < 0) { toast("Please enter a valid assignee email", "err"); return; }
 
-  const task = {
+  dataStore.tasks.unshift({
     id: "t_" + Date.now() + "_" + Math.random().toString(36).slice(2, 7),
-    title,
+    title: title,
     description: desc,
     assignedTo: assignee,
     assignedBy: normEmail(currentUser.email),
-    priority,
-    deadline,
+    priority: priority,
+    deadline: deadline,
     referenceLink: refLink,
     status: "not_started",
     videoLink: "",
-    createdAt: new Date().toISOString(),
-    updatedAt: new Date().toISOString(),
-  };
+    deleted: false,
+    createdAt: nowISO(),
+    updatedAt: nowISO(),
+    completedAt: null,
+  });
 
-  tasks.unshift(task);
-  saveDataToDrive();
-  renderTasks();
+  shareFileWith(assignee).then(() => saveToDrive()).then(renderAll);
 
-  document.getElementById("taskTitle").value = "";
-  document.getElementById("taskDesc").value = "";
-  document.getElementById("taskAssignee").value = "";
-  document.getElementById("taskDeadline").value = "";
-  document.getElementById("taskRefLink").value = "";
+  ["taskTitle", "taskDesc", "taskAssignee", "taskDeadline", "taskRefLink"].forEach((id) => {
+    document.getElementById(id).value = "";
+  });
   document.getElementById("taskPriority").value = "medium";
+  toast("Task assigned to " + assignee, "ok");
+  renderAll();
 }
 
-function updateStatus(taskId, newStatus) {
-  const t = tasks.find((x) => x.id === taskId);
+function updateStatus(id, status) {
+  const t = dataStore.tasks.find((x) => x.id === id);
   if (!t) return;
-  t.status = newStatus;
-  t.updatedAt = new Date().toISOString();
-  saveDataToDrive();
-  renderTasks();
+  t.status = status;
+  t.updatedAt = nowISO();
+  saveToDrive().then(renderAll);
+  renderAll();
 }
 
-function submitVideoLink(taskId) {
-  const input = document.getElementById("videoLinkInput_" + taskId);
-  const link = input.value.trim();
-  if (!link) { alert("Please enter a video link"); return; }
-  const t = tasks.find((x) => x.id === taskId);
+function submitVideoLink(id) {
+  const input = document.getElementById("vl_" + id);
+  const link = (input && input.value || "").trim();
+  if (!link) { toast("Please enter a video link", "err"); return; }
+  const t = dataStore.tasks.find((x) => x.id === id);
   if (!t) return;
   t.videoLink = link;
   t.status = "done";
-  t.updatedAt = new Date().toISOString();
-  t.completedAt = new Date().toISOString();
-
-  // Award points for the month
-  const monthKey = t.completedAt.slice(0, 7); // YYYY-MM
-  const pts = PRIORITY_POINTS[t.priority] || PRIORITY_POINTS.medium;
-  if (!dataStore.scores[t.assignedTo]) dataStore.scores[t.assignedTo] = {};
-  dataStore.scores[t.assignedTo][monthKey] = (dataStore.scores[t.assignedTo][monthKey] || 0) + pts;
-
-  saveDataToDrive();
-  renderTasks();
-  renderLeaderboard();
-  renderMyScore();
+  t.completedAt = nowISO();
+  t.updatedAt = nowISO();
+  saveToDrive().then(renderAll);
+  toast("Task completed — +" + (POINTS[t.priority] || 20) + " points!", "ok");
+  renderAll();
 }
 
-function deleteTask(taskId) {
-  if (!confirm("Delete this task?")) return;
-  tasks = tasks.filter((x) => x.id !== taskId);
-  saveDataToDrive();
-  renderTasks();
+function requestDelete(id) {
+  if (pendingDeleteId === id) {
+    const t = dataStore.tasks.find((x) => x.id === id);
+    if (t) { t.deleted = true; t.updatedAt = nowISO(); }
+    pendingDeleteId = null;
+    clearTimeout(pendingDeleteTimer);
+    saveToDrive().then(renderAll);
+    toast("Task deleted", "ok");
+    renderAll();
+  } else {
+    pendingDeleteId = id;
+    clearTimeout(pendingDeleteTimer);
+    pendingDeleteTimer = setTimeout(() => { pendingDeleteId = null; renderTasks(); }, 4000);
+    renderTasks();
+  }
 }
 
 function setFilter(f) {
   currentFilter = f;
-  document.querySelectorAll(".tab[data-filter]").forEach((t) => t.classList.remove("active"));
-  document.querySelector(`.tab[data-filter="${f}"]`).classList.add("active");
+  document.querySelectorAll("#statusTabs .tab").forEach((t) => t.classList.remove("active"));
+  document.querySelector('#statusTabs .tab[data-filter="' + f + '"]').classList.add("active");
   renderTasks();
 }
 function setPriorityFilter(f) {
   currentPriorityFilter = f;
-  document.querySelectorAll(".tab[data-pfilter]").forEach((t) => t.classList.remove("active"));
-  document.querySelector(`.tab[data-pfilter="${f}"]`).classList.add("active");
+  document.querySelectorAll("#prioTabs .tab").forEach((t) => t.classList.remove("active"));
+  document.querySelector('#prioTabs .tab[data-pfilter="' + f + '"]').classList.add("active");
   renderTasks();
 }
 
-/* ================= LEADERBOARD ================= */
-function currentMonthKey() {
-  return new Date().toISOString().slice(0, 7);
+/* ==================== SCORING (derived from tasks) ==================== */
+function scoresForMonth(mk) {
+  const map = {};
+  dataStore.tasks.forEach((t) => {
+    if (t.deleted || t.status !== "done" || !t.completedAt) return;
+    if (monthKey(t.completedAt) !== mk) return;
+    const pts = POINTS[t.priority] || POINTS.medium;
+    if (!map[t.assignedTo]) map[t.assignedTo] = { points: 0, count: 0 };
+    map[t.assignedTo].points += pts;
+    map[t.assignedTo].count += 1;
+  });
+  return map;
+}
+
+/* ==================== RENDER ==================== */
+function renderAll() {
+  renderStats();
+  renderLeaderboard();
+  renderMyScore();
+  renderKnownEditors();
+  safeRenderTasks();
+}
+
+function activeTasks() { return dataStore.tasks.filter((t) => !t.deleted); }
+
+function renderStats() {
+  if (!isAdminUser) return;
+  const ts = activeTasks();
+  const today = new Date(); today.setHours(0, 0, 0, 0);
+  const overdue = ts.filter((t) => t.status !== "done" && t.deadline && new Date(t.deadline) < today).length;
+  const c = (s) => ts.filter((t) => t.status === s).length;
+  document.getElementById("statsRow").innerHTML =
+    '<div class="stat s-blue"><div class="num">' + ts.length + '</div><div class="lbl">Total</div></div>' +
+    '<div class="stat s-amber"><div class="num">' + c("in_progress") + '</div><div class="lbl">In Progress</div></div>' +
+    '<div class="stat s-green"><div class="num">' + c("done") + '</div><div class="lbl">Completed</div></div>' +
+    '<div class="stat s-red"><div class="num">' + overdue + '</div><div class="lbl">Overdue</div></div>';
 }
 
 function renderLeaderboard() {
-  const mk = currentMonthKey();
-  const rows = Object.keys(dataStore.scores)
+  const mk = monthKey();
+  const scores = scoresForMonth(mk);
+  const rows = Object.keys(scores)
     .map((email) => ({
-      email,
+      email: email,
       name: (dataStore.users[email] && dataStore.users[email].name) || email,
-      points: (dataStore.scores[email] && dataStore.scores[email][mk]) || 0,
+      points: scores[email].points,
+      count: scores[email].count,
     }))
-    .filter((r) => r.points > 0)
     .sort((a, b) => b.points - a.points);
 
   const list = document.getElementById("leaderboardList");
-  if (rows.length === 0) {
-    list.innerHTML = `<div class="empty-state">No tasks completed this month yet.</div>`;
+  if (!rows.length) {
+    list.innerHTML = '<div class="empty-state">No tasks completed this month yet.</div>';
     return;
   }
-  list.innerHTML = rows
-    .map((r, i) => `
-      <div class="lb-row">
-        <div class="lb-rank ${i === 0 ? "gold" : ""}">${i + 1}</div>
-        <div class="lb-name">${escapeHtml(r.name)}</div>
-        <div class="lb-points">${r.points} pts</div>
-      </div>
-    `)
-    .join("");
+  const medals = ["🥇", "🥈", "🥉"];
+  list.innerHTML = rows.map((r, i) =>
+    '<div class="lb-row">' +
+      '<div class="lb-rank">' + (medals[i] || (i + 1)) + '</div>' +
+      '<div class="lb-name">' + escapeHtml(r.name) +
+        ' <span class="lb-sub">· ' + r.count + ' task' + (r.count > 1 ? "s" : "") + '</span></div>' +
+      '<div class="lb-points">' + r.points + ' pts</div>' +
+    '</div>'
+  ).join("");
 }
 
 function renderMyScore() {
   if (isAdminUser) return;
-  const mk = currentMonthKey();
-  const key = normEmail(currentUser.email);
-  const pts = (dataStore.scores[key] && dataStore.scores[key][mk]) || 0;
-  document.getElementById("myScoreValue").textContent = pts;
+  const mk = monthKey();
+  const s = scoresForMonth(mk)[normEmail(currentUser.email)] || { points: 0, count: 0 };
+  document.getElementById("myScoreValue").textContent = s.points;
+  document.getElementById("myScoreSub").textContent = s.count + " task" + (s.count === 1 ? "" : "s") + " completed this month";
 }
 
-/* ================= RENDER TASKS ================= */
+function renderKnownEditors() {
+  const dl = document.getElementById("knownEditors");
+  if (!dl) return;
+  const set = new Set();
+  Object.keys(dataStore.users || {}).forEach((e) => { if (e !== normEmail(ADMIN_EMAIL)) set.add(e); });
+  dataStore.tasks.forEach((t) => { if (t.assignedTo) set.add(t.assignedTo); });
+  dl.innerHTML = Array.from(set).map((e) =>
+    '<option value="' + escapeAttr(e) + '">' +
+    escapeAttr((dataStore.users[e] && dataStore.users[e].name) || "") + '</option>'
+  ).join("");
+}
+
+function safeRenderTasks() {
+  const ae = document.activeElement;
+  if (ae && ae.closest && ae.closest("#taskList")) return; // don't wipe typing
+  renderTasks();
+}
+
 function statusLabel(s) {
   return { not_started: "Not Started", in_progress: "In Progress", done: "Completed" }[s] || s;
 }
-function priorityLabel(p) {
-  return { high: "🔴 High", medium: "🟡 Medium", low: "⚪ Low" }[p] || p;
+function prioLabel(p) {
+  return { high: "High", medium: "Medium", low: "Low" }[p] || p;
+}
+function fmtDate(d) {
+  try {
+    return new Date(d + "T00:00:00").toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric" });
+  } catch (e) { return d; }
 }
 
 function renderTasks() {
   const list = document.getElementById("taskList");
-  const myEmail = normEmail(currentUser.email);
+  const me = normEmail(currentUser.email);
+  const today = new Date(); today.setHours(0, 0, 0, 0);
 
-  let visible = tasks.filter((t) => {
-    if (!isAdminUser && t.assignedTo !== myEmail) return false;
+  let visible = activeTasks().filter((t) => {
+    if (!isAdminUser && t.assignedTo !== me) return false;
     if (currentFilter !== "all" && t.status !== currentFilter) return false;
     if (currentPriorityFilter !== "all" && t.priority !== currentPriorityFilter) return false;
     return true;
   });
 
-  // Sort: high priority first, then by deadline
-  const priorityOrder = { high: 0, medium: 1, low: 2 };
-  visible.sort((a, b) => (priorityOrder[a.priority] ?? 1) - (priorityOrder[b.priority] ?? 1));
+  const po = { high: 0, medium: 1, low: 2 };
+  visible.sort((a, b) => {
+    const p = (po[a.priority] != null ? po[a.priority] : 1) - (po[b.priority] != null ? po[b.priority] : 1);
+    if (p !== 0) return p;
+    if (a.deadline && b.deadline) return a.deadline < b.deadline ? -1 : 1;
+    if (a.deadline) return -1;
+    if (b.deadline) return 1;
+    return a.createdAt < b.createdAt ? 1 : -1;
+  });
 
-  if (visible.length === 0) {
-    list.innerHTML = `<div class="empty-state">No tasks found.</div>`;
+  if (!visible.length) {
+    list.innerHTML = '<div class="empty-state">' +
+      (isAdminUser
+        ? "No tasks match these filters."
+        : (dataFileId
+            ? "No tasks match these filters."
+            : "No tasks assigned to you yet.<br>Ask the admin to assign you a task — it will appear here automatically.")) +
+      '</div>';
     return;
   }
 
-  list.innerHTML = visible
-    .map((t) => {
-      const canEdit = !isAdminUser && t.assignedTo === myEmail;
-      return `
-        <div class="task priority-${t.priority || "medium"}">
-          <div class="task-top">
-            <div>
-              <p class="task-title">${escapeHtml(t.title)}</p>
-              <p class="task-desc">${escapeHtml(t.description || "")}</p>
-            </div>
-            <div style="display:flex; flex-direction:column; gap:6px; align-items:flex-end;">
-              <span class="pill status-${t.status}">${statusLabel(t.status)}</span>
-              <span class="pill prio-${t.priority || "medium"}">${priorityLabel(t.priority || "medium")}</span>
-            </div>
-          </div>
-          <div class="meta-row">
-            <span>👤 ${escapeHtml(t.assignedTo)}</span>
-            ${t.deadline ? `<span>📅 ${escapeHtml(t.deadline)}</span>` : ""}
-            ${t.referenceLink ? `<span>🔗 <a href="${escapeAttr(t.referenceLink)}" target="_blank" style="color:var(--accent)">Reference</a></span>` : ""}
-          </div>
+  list.innerHTML = visible.map((t) => {
+    const canEdit = !isAdminUser && t.assignedTo === me;
+    const isOverdue = t.status !== "done" && t.deadline && new Date(t.deadline) < today;
+    const isPendingDel = pendingDeleteId === t.id;
+    return (
+      '<div class="task priority-' + (t.priority || "medium") + '">' +
+        '<div class="task-top">' +
+          '<div style="min-width:0;">' +
+            '<p class="task-title">' + escapeHtml(t.title) + '</p>' +
+            (t.description ? '<p class="task-desc">' + escapeHtml(t.description) + '</p>' : "") +
+          '</div>' +
+          '<div class="pills">' +
+            '<span class="pill status-' + t.status + '"><span class="pdot"></span>' + statusLabel(t.status) + '</span>' +
+            '<span class="pill prio-' + (t.priority || "medium") + '">' + prioLabel(t.priority || "medium") + ' · ' + (POINTS[t.priority] || 20) + ' pts</span>' +
+          '</div>' +
+        '</div>' +
+        '<div class="meta-row">' +
+          '<span>👤 ' + escapeHtml(t.assignedTo) + '</span>' +
+          (t.deadline
+            ? '<span class="' + (isOverdue ? "overdue" : "") + '">📅 ' + fmtDate(t.deadline) + (isOverdue ? " · Overdue" : "") + '</span>'
+            : "") +
+          (t.referenceLink ? '<span>🔗 <a href="' + escapeAttr(t.referenceLink) + '" target="_blank" rel="noopener">Reference</a></span>' : "") +
+        '</div>' +
 
-          ${canEdit && t.status !== "done" ? `
-            <div class="task-actions">
-              ${t.status === "not_started" ? `<button class="btn small" onclick="updateStatus('${t.id}','in_progress')">Start Working</button>` : ""}
-              ${t.status === "in_progress" ? `
-                <input type="url" id="videoLinkInput_${t.id}" placeholder="Paste the video link" style="flex:1; min-width:180px;" />
-                <button class="btn small" onclick="submitVideoLink('${t.id}')">Mark Done + Submit Link</button>
-              ` : ""}
-            </div>
-          ` : ""}
+        (canEdit && t.status !== "done"
+          ? '<div class="task-actions">' +
+              (t.status === "not_started"
+                ? '<button class="btn small" onclick="updateStatus(\'' + t.id + '\',\'in_progress\')">▶ Start Working</button>'
+                : '') +
+              (t.status === "in_progress"
+                ? '<input type="url" id="vl_' + t.id + '" placeholder="Paste the final video link" />' +
+                  '<button class="btn small" onclick="submitVideoLink(\'' + t.id + '\')">✓ Mark Complete</button>'
+                : '') +
+            '</div>'
+          : "") +
 
-          ${t.status === "done" && t.videoLink ? `
-            <div class="link-box">✅ Video: <a href="${escapeAttr(t.videoLink)}" target="_blank">${escapeHtml(t.videoLink)}</a></div>
-          ` : ""}
+        (t.status === "done" && t.videoLink
+          ? '<div class="link-box">✅ Video: <a href="' + escapeAttr(t.videoLink) + '" target="_blank" rel="noopener">' + escapeHtml(t.videoLink) + '</a></div>'
+          : "") +
 
-          ${isAdminUser ? `
-            <div class="task-actions">
-              <button class="btn small secondary" onclick="deleteTask('${t.id}')">Delete</button>
-            </div>
-          ` : ""}
-        </div>
-      `;
-    })
-    .join("");
+        (isAdminUser
+          ? '<div class="task-actions">' +
+              '<button class="btn small ' + (isPendingDel ? "danger" : "secondary") + '" onclick="requestDelete(\'' + t.id + '\')">' +
+                (isPendingDel ? "Confirm delete?" : "Delete") +
+              '</button>' +
+            '</div>'
+          : "") +
+      '</div>'
+    );
+  }).join("");
 }
 
-function escapeHtml(str) {
-  const div = document.createElement("div");
-  div.textContent = str || "";
-  return div.innerHTML;
+/* ==================== ONBOARDING ==================== */
+function showOnboarding() {
+  const list = document.getElementById("onboardList");
+  list.innerHTML = ONBOARDING_ITEMS.map((it, i) =>
+    '<div class="onboard-item">' +
+      '<input type="checkbox" id="ob_' + i + '" onchange="obCheck()" />' +
+      '<div><p>' + escapeHtml(it.title) + '</p><span>' + escapeHtml(it.desc) + '</span></div>' +
+    '</div>'
+  ).join("");
+  document.getElementById("obDoneBtn").disabled = true;
+  document.getElementById("onboardOverlay").style.display = "flex";
 }
-function escapeAttr(str) {
-  return (str || "").replace(/"/g, "&quot;");
+
+function obCheck() {
+  const boxes = document.querySelectorAll("#onboardList input[type=checkbox]");
+  document.getElementById("obDoneBtn").disabled = !Array.prototype.every.call(boxes, (b) => b.checked);
+}
+
+function completeOnboarding() {
+  const k = normEmail(currentUser.email);
+  if (!dataStore.users[k]) dataStore.users[k] = { name: currentUser.name, firstSeen: nowISO() };
+  dataStore.users[k].onboardingComplete = true;
+  saveToDrive();
+  document.getElementById("onboardOverlay").style.display = "none";
+  toast("Welcome aboard! 🎉", "ok");
+}
+
+/* ==================== UTILS ==================== */
+function escapeHtml(s) {
+  const d = document.createElement("div");
+  d.textContent = s || "";
+  return d.innerHTML;
+}
+function escapeAttr(s) {
+  return String(s || "").replace(/&/g, "&amp;").replace(/"/g, "&quot;").replace(/</g, "&lt;");
 }
 </script>
 </body>
