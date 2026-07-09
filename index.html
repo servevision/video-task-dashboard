@@ -197,7 +197,8 @@
       <div class="form-row">
         <div>
           <label>Assign To (Editor's Email) *</label>
-          <input type="text" id="taskAssignee" placeholder="editor@example.com" />
+          <input type="text" id="taskAssignee" placeholder="editor@example.com" list="knownEditors" autocomplete="off" />
+          <datalist id="knownEditors"></datalist>
         </div>
         <div>
           <label>Priority</label>
@@ -363,6 +364,24 @@ async function initApp() {
   renderLeaderboard();
   renderMyScore();
   renderTasks();
+  renderKnownEditors();
+
+  // Auto-refresh from Drive every 20s so changes made elsewhere show up
+  setInterval(async () => {
+    await loadDataFromDrive();
+    ensureUserRecord();
+    renderLeaderboard();
+    renderMyScore();
+    renderTasks();
+    renderKnownEditors();
+  }, 20000);
+}
+
+function renderKnownEditors() {
+  const dl = document.getElementById("knownEditors");
+  if (!dl) return;
+  const emails = Object.keys(dataStore.users || {}).filter((e) => e !== normEmail(ADMIN_EMAIL));
+  dl.innerHTML = emails.map((e) => `<option value="${escapeAttr(e)}">${escapeAttr((dataStore.users[e] && dataStore.users[e].name) || "")}</option>`).join("");
 }
 
 let dataStore = { tasks: [], users: {}, scores: {} };
@@ -441,6 +460,32 @@ async function loadDataFromDrive() {
 
 async function saveDataToDrive() {
   setSyncStatus("saving", "Saving...");
+
+  // Refetch the latest version from Drive first, so we merge on top of
+  // anyone else's more recent changes instead of overwriting them.
+  try {
+    if (dataFileId) {
+      const res = await fetch(
+        `https://www.googleapis.com/drive/v3/files/${dataFileId}?alt=media`,
+        { headers: { Authorization: `Bearer ${accessToken}` } }
+      );
+      if (res.ok) {
+        const latest = await res.json();
+        const latestTasks = latest.tasks || [];
+        const localIds = new Set(tasks.map((t) => t.id));
+
+        // Keep remote tasks we don't know about locally, then overlay our local versions
+        const merged = latestTasks.filter((t) => !localIds.has(t.id));
+        tasks = [...tasks, ...merged];
+
+        dataStore.users = { ...(latest.users || {}), ...dataStore.users };
+        dataStore.scores = mergeScores(latest.scores || {}, dataStore.scores);
+      }
+    }
+  } catch (e) {
+    console.warn("Could not refetch before save, proceeding with local copy", e);
+  }
+
   dataStore.tasks = tasks;
   const content = JSON.stringify(dataStore, null, 2);
   const blob = new Blob([content], { type: "application/json" });
@@ -472,6 +517,21 @@ async function saveDataToDrive() {
     console.error(err);
     setSyncStatus("error", "Save failed — retrying next change");
   }
+}
+
+function mergeScores(remote, local) {
+  const result = {};
+  const emails = new Set([...Object.keys(remote), ...Object.keys(local)]);
+  emails.forEach((email) => {
+    const r = remote[email] || {};
+    const l = local[email] || {};
+    const months = new Set([...Object.keys(r), ...Object.keys(l)]);
+    result[email] = {};
+    months.forEach((m) => {
+      result[email][m] = Math.max(r[m] || 0, l[m] || 0);
+    });
+  });
+  return result;
 }
 
 function setSyncStatus(state, text) {
