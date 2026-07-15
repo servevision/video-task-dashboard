@@ -236,6 +236,24 @@
   .toast.err { border-color: rgba(248,113,113,0.4); }
   @keyframes slideIn { from { transform: translateX(20px); opacity: 0; } to { transform: none; opacity: 1; } }
 
+  @keyframes fadeSlideUp { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: none; } }
+  @keyframes popIn { from { opacity: 0; transform: scale(0.96); } to { opacity: 1; transform: scale(1); } }
+  .container > * { animation: fadeSlideUp 0.35s ease both; }
+  .task { animation: popIn 0.25s ease both; }
+  header {
+    position: sticky; top: 0; z-index: 50; background: rgba(11,13,18,0.75);
+    backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px);
+    margin: 0 -16px 18px; padding: 16px; border-radius: 0 0 16px 16px;
+  }
+  ::-webkit-scrollbar { width: 10px; height: 10px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb { background: #2b303c; border-radius: 10px; }
+  ::-webkit-scrollbar-thumb:hover { background: #3a4150; }
+  .stat { transition: transform .15s ease, border-color .15s ease; cursor: default; }
+  .stat:hover { transform: translateY(-2px); border-color: #3a4150; }
+  .task { transform: translateZ(0); }
+  .task:hover { transform: translateY(-2px); box-shadow: 0 10px 32px rgba(0,0,0,0.4); }
+  .score-big { animation: popIn 0.4s cubic-bezier(.34,1.56,.64,1) both; }
   @media (max-width: 560px) {
     header { flex-direction: column; align-items: flex-start; }
     .form-row { flex-direction: column; gap: 0; }
@@ -396,6 +414,17 @@ let tokenClient = null;
 let pollTimer = null;
 let pendingDeleteId = null;
 let pendingDeleteTimer = null;
+let saveDebounceTimer = null;
+let isDirty = false;
+let lastRenderHash = "";
+
+function scheduleSave() {
+  isDirty = true;
+  clearTimeout(saveDebounceTimer);
+  saveDebounceTimer = setTimeout(() => {
+    if (isDirty) { isDirty = false; saveToDrive(); }
+  }, 500);
+}
 
 const normEmail = (e) => (e || "").trim().toLowerCase();
 const nowISO = () => new Date().toISOString();
@@ -549,6 +578,7 @@ function adoptRemote(json) {
 }
 
 async function syncFromDrive(isFirst) {
+  if (isDirty && !isFirst) return; // don't clobber an in-flight local edit
   setSync("saving", isFirst ? "Loading…" : "Syncing…");
   try {
     if (!dataFileId) dataFileId = await findDataFile();
@@ -563,7 +593,15 @@ async function syncFromDrive(isFirst) {
         return;
       }
     } else {
-      adoptRemote(await fetchFileContent());
+      const remote = await fetchFileContent();
+      const remoteHash = JSON.stringify(remote.tasks || []).length + ":" + (remote.tasks || []).length;
+      if (isFirst || remoteHash !== lastRenderHash) {
+        adoptRemote(remote);
+        lastRenderHash = remoteHash;
+      } else {
+        setSync("ok", "Synced with Google Drive");
+        return;
+      }
       setSync("ok", "Synced with Google Drive");
     }
 
@@ -728,7 +766,8 @@ function createTask() {
     completedAt: null,
   });
 
-  shareFileWith(assignee).then(() => saveToDrive()).then(renderAll);
+  shareFileWith(assignee);
+  scheduleSave();
 
   ["taskTitle", "taskDesc", "taskAssignee", "taskDeadline", "taskRefLink"].forEach((id) => {
     document.getElementById(id).value = "";
@@ -743,8 +782,8 @@ function updateStatus(id, status) {
   if (!t) return;
   t.status = status;
   t.updatedAt = nowISO();
-  saveToDrive().then(renderAll);
   renderAll();
+  scheduleSave();
 }
 
 function submitVideoLink(id) {
@@ -757,9 +796,9 @@ function submitVideoLink(id) {
   t.status = "done";
   t.completedAt = nowISO();
   t.updatedAt = nowISO();
-  saveToDrive().then(renderAll);
-  toast("Task completed — +" + (POINTS[t.priority] || 20) + " points!", "ok");
   renderAll();
+  scheduleSave();
+  toast("Task completed — +" + (POINTS[t.priority] || 20) + " points!", "ok");
 }
 
 function requestDelete(id) {
@@ -768,9 +807,9 @@ function requestDelete(id) {
     if (t) { t.deleted = true; t.updatedAt = nowISO(); }
     pendingDeleteId = null;
     clearTimeout(pendingDeleteTimer);
-    saveToDrive().then(renderAll);
-    toast("Task deleted", "ok");
     renderAll();
+    scheduleSave();
+    toast("Task deleted", "ok");
   } else {
     pendingDeleteId = id;
     clearTimeout(pendingDeleteTimer);
@@ -888,7 +927,7 @@ function statusLabel(s) {
   return { not_started: "Not Started", in_progress: "In Progress", done: "Completed" }[s] || s;
 }
 function prioLabel(p) {
-  return { high: "High", medium: "Medium", low: "Low" }[p] || p;
+  return { high: "🔴 High", medium: "🟡 Medium", low: "⚪ Low" }[p] || p;
 }
 function fmtDate(d) {
   try {
